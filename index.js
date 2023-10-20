@@ -30,18 +30,41 @@ async function run() {
 
     // api for getting the brand ads
     app.get("/brands/:id", async (req, res) => {
+      // extract route parameter
       const id = req.params.id;
+      // build the search query
       const query = { brandName: id };
+      // find according to the search query
       const result = await brands.findOne(query);
+      // send to client side
       res.send(result);
     });
 
     // api for getting products for specific brands
     app.get("/brands/:id/products", async (req, res) => {
+      // extract route parameter
       const id = req.params.id;
+      // select collection according to the parameter
       const collection = database.collection(`${id}`);
+      // make cursor
       const cursor = collection.find();
+      // return an array of all the results found
       const result = await cursor.toArray();
+      // send data to client side
+      res.send(result);
+    });
+
+    // api for adding products to specific brands
+    app.post("/brands/:id/products", async (req, res) => {
+      // extract route parameter
+      const id = req.params.id;
+      // extract data to be added to database
+      const item = req.body;
+      // select collection based on route parameter
+      const collection = database.collection(`${id}`);
+      // insert to collecton
+      const result = await collection.insertOne(item);
+      // send to client side
       res.send(result);
     });
 
