@@ -100,10 +100,31 @@ async function run() {
     });
 
     // api for adding to overall cart
-    app.post("/cart", async (req, res) => {
+    app.post("/cart/add", async (req, res) => {
       const item = req.body;
       const collection = database.collection("cart");
       const result = await collection.insertOne(item);
+      res.send(result);
+    });
+
+    // api for search specific email's cart products
+    app.post("/cart", async (req, res) => {
+      const email = req.body.email;
+      const collection = database.collection("cart");
+      const query = { addedBy: email };
+      const cursor = collection.find(query);
+      const result = await cursor.toArray();
+      console.log(result);
+      res.send(result);
+    });
+
+    // api to delete specific cart product
+    app.delete("/cart/:id", async (req, res) => {
+      const item = req.params.id;
+      const objectId = new ObjectId(item);
+      const filter = { _id: objectId };
+      const collection = database.collection("cart");
+      const result = await collection.deleteOne(filter);
       res.send(result);
     });
 
