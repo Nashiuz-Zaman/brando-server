@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion, Collection } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASS}@cluster0.ejmezk0.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const database = client.db("assignment10");
     const brands = database.collection("brands");
@@ -68,11 +68,42 @@ async function run() {
       res.send(result);
     });
 
+    // api for getting single product
+    app.get("/brands/:brandId/products/:productId", async (req, res) => {
+      const brandId = req.params.brandId;
+      const productId = req.params.productId;
+
+      const collection = database.collection(`${brandId}`);
+      const objectId = new ObjectId(productId);
+      const query = { _id: objectId };
+
+      const result = await collection.findOne(query);
+      res.send(result);
+    });
+
+    // api for setting single product
+    app.put("/brands/:brandId/products/update/:productId", async (req, res) => {
+      const brandId = req.params.brandId;
+      const productId = req.params.productId;
+      const collection = database.collection(`${brandId}`);
+      const objectId = new ObjectId(productId);
+      const filter = { _id: objectId };
+
+      const updatedProduct = req.body;
+
+      const updateDoc = {
+        $set: updatedProduct,
+      };
+
+      const result = await collection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
