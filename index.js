@@ -99,6 +99,14 @@ async function run() {
       res.send(result);
     });
 
+    // api for adding to overall cart
+    app.post("/cart", async (req, res) => {
+      const item = req.body;
+      const collection = database.collection("cart");
+      const result = await collection.insertOne(item);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     // console.log(
