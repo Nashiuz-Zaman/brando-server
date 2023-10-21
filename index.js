@@ -89,13 +89,14 @@ async function run() {
       const objectId = new ObjectId(productId);
       const filter = { _id: objectId };
 
+      const options = { upsert: true };
       const updatedProduct = req.body;
 
       const updateDoc = {
         $set: updatedProduct,
       };
 
-      const result = await collection.updateOne(filter, updateDoc);
+      const result = await collection.updateOne(filter, updateDoc, options);
       res.send(result);
     });
 
